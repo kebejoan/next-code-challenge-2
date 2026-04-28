@@ -46,4 +46,22 @@ export class ThreadsRepository {
       },
     });
   }
+
+  async updateThread(id: string, dto: CreateThreadDto) {
+    return this.prisma.thread.update({
+      where: { id },
+      data: {
+        title: dto.title,
+        content: dto.content,
+      },
+    });
+  }
+
+  async deleteThread(id: string) {
+    return this.prisma.thread.delete({ where: { id } });
+  }
+
+  async getThreadsByUserId(userId: string) {
+    return this.prisma.thread.findMany({ where: { user_id: userId } });
+  }
 }

@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Request,
+  Put,
 } from '@nestjs/common';
 import { ThreadsService } from './threads.service';
 import { CreateThreadDto } from './dto/create-thread.dto';
@@ -20,6 +21,12 @@ import type { AuthenticatedRequest } from 'src/auth/interface';
 @Controller('threads')
 export class ThreadsController {
   constructor(private readonly threadsService: ThreadsService) {}
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/my-threads')
+  findByUser(@Request() req: AuthenticatedRequest) {
+    return this.threadsService.findMany(req.user.sub);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -40,13 +47,19 @@ export class ThreadsController {
     return this.threadsService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateThreadDto: UpdateThreadDto) {
-    return this.threadsService.update(+id, updateThreadDto);
+  @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  update(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() createThreadDto: CreateThreadDto,
+  ) {
+    return this.threadsService.update(req.user.sub, id, createThreadDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.threadsService.remove(+id);
+  remove(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
+    return this.threadsService.remove(req.user.sub, id);
   }
 }

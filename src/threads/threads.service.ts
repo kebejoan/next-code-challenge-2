@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateThreadDto } from './dto/create-thread.dto';
 import { UpdateThreadDto } from './dto/update-thread.dto';
 import { ThreadsRepository } from './threads.repository';
@@ -18,11 +22,32 @@ export class ThreadsService {
     return this.threadsRepository.getThreadById(id);
   }
 
-  update(id: number, updateThreadDto: UpdateThreadDto) {
-    return `This action updates a #${id} thread`;
+  findMany(UserId: string) {
+    return this.threadsRepository.getThreadsByUserId(UserId);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} thread`;
+  async update(userId: string, id: string, createThreadDto: CreateThreadDto) {
+    if (await this.validateUser(userId, id)) {
+      return this.threadsRepository.updateThread(id, createThreadDto);
+    }
+  }
+
+  async remove(userId: string, id: string) {
+    if (await this.validateUser(userId, id)) {
+      return this.threadsRepository.deleteThread(id.toString());
+    }
+  }
+
+  //UTILS
+  async validateUser(userId: string, id: string) {
+    const thread = await this.threadsRepository.getThreadById(id);
+    if (!thread) {
+      throw new NotFoundException('Thread not found!');
+    }
+
+    if (thread.author.id !== userId) {
+      throw new ForbiddenException('You are not the thread owner!');
+    }
+    return true;
   }
 }
