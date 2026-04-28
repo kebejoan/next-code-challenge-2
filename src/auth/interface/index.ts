@@ -1,4 +1,10 @@
+import { Request } from 'express';
+
 export interface Payload {
-  sub: number;
+  sub: string;
   email: string;
+}
+
+export interface AuthenticatedRequest extends Request {
+  user: Payload;
 }
