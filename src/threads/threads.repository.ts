@@ -31,4 +31,19 @@ export class ThreadsRepository {
       orderBy: { created_at: 'desc' },
     });
   }
+
+  async getThreadById(id: string) {
+    return this.prisma.thread.findUnique({
+      where: { id },
+      include: {
+        author: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
 }

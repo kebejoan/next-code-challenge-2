@@ -14,8 +14,8 @@ export class ThreadsService {
     return this.threadsRepository.getAllThreads();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} thread`;
+  findOne(id: string) {
+    return this.threadsRepository.getThreadById(id);
   }
 
   update(id: number, updateThreadDto: UpdateThreadDto) {

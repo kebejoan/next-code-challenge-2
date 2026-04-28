@@ -37,7 +37,7 @@ export class ThreadsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.threadsService.findOne(+id);
+    return this.threadsService.findOne(id);
   }
 
   @Patch(':id')
