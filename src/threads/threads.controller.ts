@@ -1,15 +1,33 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { ThreadsService } from './threads.service';
 import { CreateThreadDto } from './dto/create-thread.dto';
 import { UpdateThreadDto } from './dto/update-thread.dto';
+import { ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt.auth-guard';
+import type { AuthenticatedRequest } from 'src/auth/interface';
 
+@ApiTags('threads')
 @Controller('threads')
 export class ThreadsController {
   constructor(private readonly threadsService: ThreadsService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createThreadDto: CreateThreadDto) {
-    return this.threadsService.create(createThreadDto);
+  create(
+    @Request() req: AuthenticatedRequest,
+    @Body() createThreadDto: CreateThreadDto,
+  ) {
+    return this.threadsService.create(createThreadDto, req.user.sub);
   }
 
   @Get()
